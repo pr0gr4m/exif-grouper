@@ -52,6 +52,7 @@ ExifWidget::ExifWidget(std::vector<MetaData> &metaVector, int group, QWidget *pa
             ui->textBrowser->append(QString::fromStdString(string("Exposure Time : ") + to_string(result.ExposureTime)));
             ui->textBrowser->append(QString::fromStdString(string("Exposure Program : ") + to_string(result.ExposureProgram)));
             ui->textBrowser->append(QString::fromStdString(string("Subject Distance : ") + to_string(result.SubjectDistance)));
+            ui->textBrowser->append(QString::fromStdString(string("ISO Speed : ") + to_string(result.ISOSpeedRatings)));
             ui->textBrowser->append(QString::fromStdString(string("Flash Used : ") + to_string(result.Flash)));
             ui->textBrowser->append(QString::fromStdString(string("Flash Mode : ") + to_string(result.FlashMode)));
             ui->textBrowser->append(QString::fromStdString(string("GPS Latitude : ") + to_string(result.GeoLocation.Latitude)));

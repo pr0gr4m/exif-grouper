@@ -76,27 +76,27 @@ void MainWindow::on_btnApply_clicked()
     unsigned int flag = 0;
     if (ui->checkSoftware->isChecked()) {
         flag |= MetaData::SOFTWARE;
-        sort(metaVector.begin(), metaVector.end(), compSoftware);
+        stable_sort(metaVector.begin(), metaVector.end(), compSoftware);
     }
     if (ui->checkSize->isChecked()) {
         flag |= MetaData::SIZE;
-        sort(metaVector.begin(), metaVector.end(), compSize);
+        stable_sort(metaVector.begin(), metaVector.end(), compSize);
     }
     if (ui->checkDate->isChecked()) {
         flag |= MetaData::DATE;
-        sort(metaVector.begin(), metaVector.end(), compDate);
+        stable_sort(metaVector.begin(), metaVector.end(), compDate);
     }
     if (ui->checkISO->isChecked()) {
         flag |= MetaData::ISO;
-        sort(metaVector.begin(), metaVector.end(), compISO);
+        stable_sort(metaVector.begin(), metaVector.end(), compISO);
     }
     if (ui->checkExpo->isChecked()) {
         flag |= MetaData::EXPO;
-        sort(metaVector.begin(), metaVector.end(), compExpo);
+        stable_sort(metaVector.begin(), metaVector.end(), compExpo);
     }
     if (ui->checkAltitude->isChecked()) {
         flag |= MetaData::ALTITUDE;
-        sort(metaVector.begin(), metaVector.end(), compAltitude);
+        stable_sort(metaVector.begin(), metaVector.end(), compAltitude);
     }
 
     for (int i = 0; i < metaVector.size() - 1; i++) {
@@ -107,9 +107,22 @@ void MainWindow::on_btnApply_clicked()
         }
     }
 
+    std::vector<int> tmp(MetaData::groupCounter + 1, 0);
+    for (int i = 0; i < metaVector.size(); i++) {
+        tmp[metaVector[i].group()] += 1;
+    }
+    std::vector<int>::iterator maxIt = max_element(tmp.begin(), tmp.end());
+
     for (int i = 1; i <= MetaData::groupCounter; i++) {
         ui->listFiles->addItem(QString::fromStdString(string("Group ") + to_string(i)));
     }
+
+    QMessageBox *maxMessage = new QMessageBox();
+    maxMessage->setText(QString::fromStdString(string("Largest - Group ")
+                                              + to_string( distance(tmp.begin(), maxIt) )
+                                              + " : #"
+                                              + to_string(*maxIt)));
+    maxMessage->show();
 }
 
 void MainWindow::on_btnDetail_clicked()
