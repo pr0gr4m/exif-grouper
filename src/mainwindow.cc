@@ -128,6 +128,8 @@ void MainWindow::on_btnApply_clicked()
 void MainWindow::on_btnDetail_clicked()
 {
     QList<QListWidgetItem*> list = ui->listFiles->selectedItems();
+    if (list.begin() == list.end())
+        return;
     QString str = (*(list.begin()))->text();
     string grpStr = str.toStdString();
     ExifWidget *newWidget = new ExifWidget(metaVector, grpStr.at(6) - '0');
