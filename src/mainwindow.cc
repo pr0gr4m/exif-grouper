@@ -45,12 +45,7 @@ void MainWindow::on_btnOpen_clicked()
                                   curr,
                                   tr("Image Files (*.jpg)"));
     ui->listFiles->addItems(imgFiles);
-}
 
-void MainWindow::on_btnApply_clicked()
-{
-    ui->listFiles->clear();
-    MetaData::groupCounter = 1;
     QStringList::iterator it;
 
     for (it = imgFiles.begin(); it != imgFiles.end(); it++) {
@@ -71,6 +66,12 @@ void MainWindow::on_btnApply_clicked()
         MetaData m(it->toStdString(), result);
         metaVector.push_back(m);
     }
+}
+
+void MainWindow::on_btnApply_clicked()
+{
+    ui->listFiles->clear();
+    MetaData::groupCounter = 1;
 
     unsigned int flag = 0;
     if (ui->checkSoftware->isChecked()) {
