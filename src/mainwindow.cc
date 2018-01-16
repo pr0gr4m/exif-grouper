@@ -113,13 +113,9 @@ void MainWindow::on_btnApply_clicked()
 
 void MainWindow::on_btnDetail_clicked()
 {
-    QList<QListWidgetItem*> items = ui->listFiles->selectedItems();
-    QList<QListWidgetItem*>::iterator it;
-    QStringList list;
-    for (it = items.begin(); it != items.end(); it++) {
-        list << (*it)->text();
-    }
-
-    ExifWidget *newWidget = new ExifWidget(list);
+    QList<QListWidgetItem*> list = ui->listFiles->selectedItems();
+    QString str = (*(list.begin()))->text();
+    string grpStr = str.toStdString();
+    ExifWidget *newWidget = new ExifWidget(metaVector, grpStr.at(6) - '0');
     newWidget->show();
 }

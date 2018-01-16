@@ -8,18 +8,18 @@
 
 using namespace std;
 
-ExifWidget::ExifWidget(QStringList fileList, QWidget *parent) :
+ExifWidget::ExifWidget(std::vector<MetaData> &metaVector, int group, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ExifWidget)
 {
     ui->setupUi(this);
 
-    QStringList::iterator it;
-    for (it = fileList.begin(); it != fileList.end(); it++) {
+    for (int i = 0; i < metaVector.size(); i++) {
 
-        ui->textBrowser->append(QString("File Name : ") + *it + QString("\n"));
+        if (metaVector[i].group() != group)
+            continue;
 
-        ifstream inFile(it->toStdString(), ios::binary | ios::ate);
+        ifstream inFile(metaVector[i].fileName(), ios::binary | ios::ate);
         ifstream::pos_type pos = inFile.tellg();
 
         int length = pos;
@@ -32,6 +32,7 @@ ExifWidget::ExifWidget(QStringList fileList, QWidget *parent) :
         delete[] buf;
         inFile.close();
 
+        ui->textBrowser->append(QString::fromStdString(string("File Name : " + metaVector[i].fileName() + "\n")));
         if (code) {
             ui->textBrowser->append(QString("Error parsing EXIF"));
         } else {
