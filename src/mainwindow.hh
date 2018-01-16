@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStringList>
 #include <vector>
+#include "metadata.hh"
 
 namespace Ui {
 class MainWindow;
@@ -31,6 +32,7 @@ private:
 private:
     Ui::MainWindow *ui;
     QStringList imgFiles;
+    std::vector<MetaData> metaVector;
 };
 
 #endif // MAINWINDOW_HH

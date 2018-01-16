@@ -1,7 +1,7 @@
 #include "mainwindow.hh"
 #include "ui_mainwindow.h"
-#include "filter.hh"
 #include "exifwidget.hh"
+#include "metadata.hh"
 
 #include <QFileDialog>
 #include <QString>
@@ -12,15 +12,22 @@
 #include <unistd.h>
 #include <cstdio>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
+
+extern bool compSoftware(const MetaData& a, const MetaData& b);
+extern bool compSize(const MetaData& a, const MetaData& b);
+extern bool compDate(const MetaData& a, const MetaData& b);
+extern bool compISO(const MetaData& a, const MetaData& b);
+extern bool compExpo(const MetaData& a, const MetaData& b);
+extern bool compAltitude(const MetaData& a, const MetaData& b);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->listFiles->setSelectionMode(QListWidget::MultiSelection);
 }
 
 MainWindow::~MainWindow()
@@ -28,9 +35,22 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::displayList()
+void MainWindow::on_btnOpen_clicked()
+{
+    char buf[256];
+    getcwd(buf, 256);
+    QString curr{ buf };
+    imgFiles = QFileDialog::getOpenFileNames(this,
+                                  tr("Open Image"),
+                                  curr,
+                                  tr("Image Files (*.jpg)"));
+    ui->listFiles->addItems(imgFiles);
+}
+
+void MainWindow::on_btnApply_clicked()
 {
     ui->listFiles->clear();
+    MetaData::groupCounter = 1;
     QStringList::iterator it;
 
     for (it = imgFiles.begin(); it != imgFiles.end(); it++) {
@@ -48,48 +68,47 @@ void MainWindow::displayList()
         delete[] buf;
         inFile.close();
 
-        if (!code && !Filter::getInstance()->cmpFilter(result))
-            continue;
-
-        ui->listFiles->addItem(*it);
+        MetaData m(it->toStdString(), result);
+        metaVector.push_back(m);
     }
-}
 
-void MainWindow::on_btnOpen_clicked()
-{
-    char buf[256];
-    getcwd(buf, 256);
-    QString curr{ buf };
-    imgFiles = QFileDialog::getOpenFileNames(this,
-                                  tr("Open Image"),
-                                  curr,
-                                  tr("Image Files (*.jpg)"));
-    displayList();
-}
-
-void MainWindow::on_btnApply_clicked()
-{
-    if (!Filter::getInstance()->setFilter(
-                ui->lineLatitudeMin->text().toStdString(),
-                ui->lineLatitudeMax->text().toStdString(),
-                ui->lineLongtitudeMin->text().toStdString(),
-                ui->lineLongtitudeMax->text().toStdString(),
-                ui->lineVedor->text().toStdString(),
-                ui->lineModel->text().toStdString(),
-                ui->lineWidthMin->text().toStdString(),
-                ui->lineWidthMax->text().toStdString(),
-                ui->lineHeightMin->text().toStdString(),
-                ui->lineHeightMax->text().toStdString(),
-                ui->lineDateMin->text().toStdString(),
-                ui->lineDateMax->text().toStdString(),
-                ui->lineTimeMin->text().toStdString(),
-                ui->lineTimeMax->text().toStdString())) {
-        // alert
-        QMessageBox errorMessage;
-        errorMessage.critical(0, "Filter Error", "Filter Format Error!");
-        errorMessage.setFixedSize(500, 200);
+    unsigned int flag = 0;
+    if (ui->checkSoftware->isChecked()) {
+        flag |= MetaData::SOFTWARE;
+        sort(metaVector.begin(), metaVector.end(), compSoftware);
     }
-    displayList();
+    if (ui->checkSize->isChecked()) {
+        flag |= MetaData::SIZE;
+        sort(metaVector.begin(), metaVector.end(), compSize);
+    }
+    if (ui->checkDate->isChecked()) {
+        flag |= MetaData::DATE;
+        sort(metaVector.begin(), metaVector.end(), compDate);
+    }
+    if (ui->checkISO->isChecked()) {
+        flag |= MetaData::ISO;
+        sort(metaVector.begin(), metaVector.end(), compISO);
+    }
+    if (ui->checkExpo->isChecked()) {
+        flag |= MetaData::EXPO;
+        sort(metaVector.begin(), metaVector.end(), compExpo);
+    }
+    if (ui->checkAltitude->isChecked()) {
+        flag |= MetaData::ALTITUDE;
+        sort(metaVector.begin(), metaVector.end(), compAltitude);
+    }
+
+    for (int i = 0; i < metaVector.size() - 1; i++) {
+        metaVector[i].group(MetaData::groupCounter);
+        if (!(metaVector[i].isEqual(metaVector[i + 1], flag))) {
+            // new group
+            MetaData::groupCounter++;
+        }
+    }
+
+    for (int i = 1; i <= MetaData::groupCounter; i++) {
+        ui->listFiles->addItem(QString::fromStdString(string("Group ") + to_string(i)));
+    }
 }
 
 void MainWindow::on_btnDetail_clicked()

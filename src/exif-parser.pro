@@ -29,14 +29,14 @@ SOURCES += \
         main.cc \
 	exif.cc \
         mainwindow.cc \
-    filter.cc \
-    exifwidget.cc
+    exifwidget.cc \
+    metadata.cc
 
 HEADERS += \
 	exif.hh \
         mainwindow.hh \
-    filter.hh \
-    exifwidget.hh
+    exifwidget.hh \
+    metadata.hh
 
 FORMS += \
         mainwindow.ui \
