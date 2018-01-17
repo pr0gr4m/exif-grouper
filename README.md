@@ -2,6 +2,10 @@
 
 [BOB6]DF12_Tech_03_박강민
 
+* src : Source directory
+* exif-parser : Executable file
+
+
 Environment
 ===========
 
@@ -41,3 +45,8 @@ Usage
 * Apply : Make group by exif filter
 * Detail : View the exif metadata for the selected group
 
+
+Result
+=======
+
+![MainWindow](https://i.imgur.com/FgYFBtE.png)
