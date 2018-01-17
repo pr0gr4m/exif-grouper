@@ -33,6 +33,9 @@ private:
     Ui::MainWindow *ui;
     QStringList imgFiles;
     std::vector<MetaData> metaVector;
+
+    bool openFlag;
+    bool groupFlag;
 };
 
 #endif // MAINWINDOW_HH

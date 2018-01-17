@@ -25,7 +25,9 @@ extern bool compAltitude(const MetaData& a, const MetaData& b);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    openFlag(false),
+    groupFlag(false)
 {
     ui->setupUi(this);
 }
@@ -66,10 +68,15 @@ void MainWindow::on_btnOpen_clicked()
         MetaData m(it->toStdString(), result);
         metaVector.push_back(m);
     }
+
+    openFlag = true;
 }
 
 void MainWindow::on_btnApply_clicked()
 {
+    if (!openFlag)
+        return;
+
     ui->listFiles->clear();
     MetaData::groupCounter = 1;
 
@@ -99,13 +106,15 @@ void MainWindow::on_btnApply_clicked()
         stable_sort(metaVector.begin(), metaVector.end(), compAltitude);
     }
 
-    for (int i = 0; i < metaVector.size() - 1; i++) {
+    int i;
+    for (i = 0; i < metaVector.size() - 1; i++) {
         metaVector[i].group(MetaData::groupCounter);
         if (!(metaVector[i].isEqual(metaVector[i + 1], flag))) {
             // new group
             MetaData::groupCounter++;
         }
     }
+    metaVector[i].group(MetaData::groupCounter);
 
     std::vector<int> tmp(MetaData::groupCounter + 1, 0);
     for (int i = 0; i < metaVector.size(); i++) {
@@ -117,6 +126,8 @@ void MainWindow::on_btnApply_clicked()
         ui->listFiles->addItem(QString::fromStdString(string("Group ") + to_string(i)));
     }
 
+    groupFlag = true;
+
     QMessageBox *maxMessage = new QMessageBox();
     maxMessage->setText(QString::fromStdString(string("Largest - Group ")
                                               + to_string( distance(tmp.begin(), maxIt) )
@@ -127,11 +138,15 @@ void MainWindow::on_btnApply_clicked()
 
 void MainWindow::on_btnDetail_clicked()
 {
+    if (!openFlag || !groupFlag)
+        return;
+
     QList<QListWidgetItem*> list = ui->listFiles->selectedItems();
     if (list.begin() == list.end())
         return;
     QString str = (*(list.begin()))->text();
     string grpStr = str.toStdString();
     ExifWidget *newWidget = new ExifWidget(metaVector, grpStr.at(6) - '0');
+
     newWidget->show();
 }
