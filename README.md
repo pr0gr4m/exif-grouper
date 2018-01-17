@@ -45,8 +45,3 @@ Usage
 * Apply : Make group by exif filter
 * Detail : View the exif metadata for the selected group
 
-
-Result
-=======
-
-![MainWindow](https://i.imgur.com/FgYFBtE.png)
